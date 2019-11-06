@@ -1,0 +1,10 @@
+﻿{
+  "intergratedSecurity": "true",
+  "sqlUsername": null,
+  "sqlPassword": null,
+  "catalog": "Atna",
+  "schema": "DBO",
+  "source": "LTHSQLDEV"
+
+
+}
