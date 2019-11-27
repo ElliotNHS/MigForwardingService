@@ -75,6 +75,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MigDbContext.cs" />
     <Compile Include="MigForwardingConfiguration.cs" />
     <Compile Include="MigForwardingService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

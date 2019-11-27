@@ -20,30 +20,15 @@ namespace MigForwardingLibrary
 
         public void Start() 
         {
-
             var config = new MigForwardingConfiguration();
-            var connectionstring = BuildConnectionString(config);
-            var dbConnection = new SqlConnection(connectionstring);
-            var queryStatement = @"SELECT TOP (1000) [EventDateTime]
-                          ,[EventType]
-                          ,[NHSNumber]
-                          ,[StateID]
-                          ,[UserID]
-                          ,[DocumentUUID]
-                          ,[DocumentTitle]
-                          ,[ClientIP]
-                       FROM[" + config.Catalog + "].[" + config.Schema + "].[" + config.TableName + "]";
-            var dataTable = new DataTable();
 
-            using (SqlCommand _cmd = new SqlCommand(queryStatement, dbConnection))
-            {
-                dbConnection.Open();
-                var adapter = new SqlDataAdapter(_cmd);
-                adapter.Fill(dataTable);
-                dbConnection.Close();
-            }
+            var dbContext = new MigDbContext(config);
+            dbContext.Upgrade();
+            var result = dbContext.SelectTop();
 
-            foreach (DataRow dataRow in dataTable.Rows)
+
+            
+            foreach (DataRow dataRow in result.Rows)
             {
                 foreach (var item in dataRow.ItemArray)
                 {
@@ -99,7 +84,7 @@ namespace MigForwardingLibrary
 
             // Build the SqlConnection connection string.
             string providerString = sqlBuilder.ToString();
-            Console.WriteLine(providerString);
+            Console.WriteLine(providerString);   
             Console.ReadKey();
 
             return providerString;
