@@ -1,0 +1,9 @@
+﻿<MigForwardingSettings>
+  <IntergratedSecurity>true</IntergratedSecurity>
+  <SqlUsername></SqlUsername>
+  <SqlPassword></SqlPassword>
+  <Catalog>ATNA-Update-Test</Catalog>
+  <Schema>dbo</Schema>
+  <Source>LTHSQLDEV</Source>
+  <TableName>log_LPRES_ATNA_Simplified</TableName>
+</MigForwardingSettings>
