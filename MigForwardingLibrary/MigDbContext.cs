@@ -56,7 +56,38 @@ namespace MigForwardingLibrary
             
 
         }
-        public void Downgrade() { }
+        
+        public void Downgrade() {
+            try
+            {
+                var dbConnection = new SqlConnection(ConnectionString);
+                var queryStatement = @"  
+                    DELETE FROM log_LPRES_ATNA_Simplified WHERE [MaywoodsID] IS NOT NULL;
+                    DELETE FROM log_LPRES_ATNA_Simplified WHERE [MaywoodsDateTime] IS NOT NULL;
+                    DELETE FROM log_LPRES_ATNA_Simplified WHERE [MaywoodsAuditID] IS NOT NULL;
+                    GO
+
+                    ALTER TABLE log_LPRES_ATNA_Simplified DROP CONSTRAINT PK_MaywoodsID PRIMARY KEY(MaywoodsID);
+
+                    IF EXISTS ( SELECT NAME FROM dbo.sysindexes WHERE name = 'idx_MaywoodsDateTime')
+                    DROP INDEX [log_LPRES_ATNA_Simplified].[idx_MaywoodsDateTime]
+                    GO";
+
+                using (SqlCommand _cmd = new SqlCommand(queryStatement, dbConnection))
+                {
+                    dbConnection.Open();
+                    _cmd.ExecuteNonQuery();
+                    dbConnection.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Failed to downgrade the MIG forwarding table");
+                Console.WriteLine(ex.Message);
+                Console.ReadKey();
+            }
+
+        }
 
         public DataTable SelectTop()
         {
