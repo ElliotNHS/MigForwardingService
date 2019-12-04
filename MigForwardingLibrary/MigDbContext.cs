@@ -56,7 +56,9 @@ namespace MigForwardingLibrary
             
 
         }
-        
+        //Check when database was last updated?
+        //select * from sys.objects
+        //order by modify_date desc
         public void Downgrade() {
             try
             {
