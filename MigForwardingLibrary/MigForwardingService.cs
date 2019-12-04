@@ -25,8 +25,6 @@ namespace MigForwardingLibrary
             var dbContext = new MigDbContext(config);
             dbContext.Upgrade();
 
-
-
             //Console.ReadKey();
             //dbContext.Downgrade();
 
@@ -35,8 +33,6 @@ namespace MigForwardingLibrary
             {
                 Console.WriteLine("It is {0} and all is well.", DateTime.Now); 
                 var result = dbContext.SelectTop50();
-
-
                 foreach (DataRow dataRow in result.Rows)
                 {
                     foreach (var item in dataRow.ItemArray)

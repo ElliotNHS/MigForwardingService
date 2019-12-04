@@ -49,19 +49,15 @@ namespace MigForwardingLibrary
 
             try
             {
-
                 ExecuteNonQuery(@"ALTER TABLE log_LPRES_ATNA_Simplified ADD[MaywoodsID]  BIGINT IDENTITY(1, 1);");
                 ExecuteNonQuery(@"ALTER TABLE log_LPRES_ATNA_Simplified ADD[MaywoodsDateTime] DATETIME;");
                 ExecuteNonQuery(@"ALTER TABLE log_LPRES_ATNA_Simplified ADD[MaywoodsAuditID] BIGINT;");
-
                 ExecuteNonQuery(@"ALTER TABLE log_LPRES_ATNA_Simplified ADD CONSTRAINT PK_MaywoodsID PRIMARY KEY(MaywoodsID);");
                 ExecuteNonQuery(@"IF EXISTS ( SELECT NAME FROM dbo.sysindexes WHERE name = 'idx_MaywoodsDateTime') 
-DROP INDEX [log_LPRES_ATNA_Simplified].[idx_MaywoodsDateTime]");
-
+                                DROP INDEX [log_LPRES_ATNA_Simplified].[idx_MaywoodsDateTime]");
 
                 ExecuteNonQuery(@"IF NOT EXISTS ( SELECT NAME FROM dbo.sysindexes WHERE name = 'idx_MaywoodsDateTime') 
-CREATE INDEX idx_MaywoodsDateTime ON [log_LPRES_ATNA_Simplified] (MaywoodsDateTime)");
-
+                                CREATE INDEX idx_MaywoodsDateTime ON [log_LPRES_ATNA_Simplified] (MaywoodsDateTime)");
 
             }
             catch (Exception ex)
@@ -70,7 +66,7 @@ CREATE INDEX idx_MaywoodsDateTime ON [log_LPRES_ATNA_Simplified] (MaywoodsDateTi
                 Console.WriteLine(ex.Message);
                 Console.ReadKey();
             }
-            
+           
 
         }
         //Check when database was last updated?
@@ -87,9 +83,6 @@ CREATE INDEX idx_MaywoodsDateTime ON [log_LPRES_ATNA_Simplified] (MaywoodsDateTi
              ExecuteNonQuery(@"ALTER TABLE log_LPRES_ATNA_Simplified DROP COLUMN[MaywoodsID];"); 
              ExecuteNonQuery(@"ALTER TABLE log_LPRES_ATNA_Simplified DROP COLUMN[MaywoodsDateTime] ;");
              ExecuteNonQuery(@"ALTER TABLE log_LPRES_ATNA_Simplified DROP COLUMN[MaywoodsAuditID] ;");
-
-     
-               
 
             }
             catch (Exception ex)
@@ -118,7 +111,6 @@ CREATE INDEX idx_MaywoodsDateTime ON [log_LPRES_ATNA_Simplified] (MaywoodsDateTi
                       ,[MaywoodsAuditID]
                        FROM[" + Config.Catalog + "].[" + Config.Schema + "].[" + Config.TableName + "]	  " +
                        "WHERE [MaywoodsDateTime] IS NULL AND  [MaywoodsAuditID] IS NULL      ORDER BY[EventDateTime] ";
-
 
             return SelectAndFill(queryStatement);
         }
