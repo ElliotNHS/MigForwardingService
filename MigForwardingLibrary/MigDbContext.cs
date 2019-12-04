@@ -19,33 +19,50 @@ namespace MigForwardingLibrary
             Config = config;
             ConnectionString = BuildConnectionString();
         }
+
+        public void ExecuteNonQuery(string queryStatement)
+        {
+            var dbConnection = new SqlConnection(ConnectionString);
+            using (SqlCommand _cmd = new SqlCommand(queryStatement, dbConnection))
+            {
+                dbConnection.Open();
+                _cmd.ExecuteNonQuery();
+                dbConnection.Close();
+            }
+        }
+        public DataTable SelectAndFill(string queryStatement)
+        {
+            var dbConnection = new SqlConnection(ConnectionString);
+            var dataTable = new DataTable();
+
+            using (SqlCommand _cmd = new SqlCommand(queryStatement, dbConnection))
+            {
+                dbConnection.Open();
+                var adapter = new SqlDataAdapter(_cmd);
+                adapter.Fill(dataTable);
+                dbConnection.Close();
+            }
+            return dataTable;
+        }
+
         public void Upgrade() {
 
             try
             {
-                var dbConnection = new SqlConnection(ConnectionString);
-                var queryStatement = @"  
-                    ALTER TABLE log_LPRES_ATNA_Simplified ADD [MaywoodsID]	BIGINT IDENTITY (1,1);
-                    ALTER TABLE log_LPRES_ATNA_Simplified ADD [MaywoodsDateTime] DATETIME;
-                    ALTER TABLE log_LPRES_ATNA_Simplified ADD [MaywoodsAuditID] BIGINT;
-                    GO
 
-                    ALTER TABLE log_LPRES_ATNA_Simplified ADD CONSTRAINT PK_MaywoodsID PRIMARY KEY(MaywoodsID);
+                ExecuteNonQuery(@"ALTER TABLE log_LPRES_ATNA_Simplified ADD[MaywoodsID]  BIGINT IDENTITY(1, 1);");
+                ExecuteNonQuery(@"ALTER TABLE log_LPRES_ATNA_Simplified ADD[MaywoodsDateTime] DATETIME;");
+                ExecuteNonQuery(@"ALTER TABLE log_LPRES_ATNA_Simplified ADD[MaywoodsAuditID] BIGINT;");
 
-                    IF EXISTS ( SELECT NAME FROM dbo.sysindexes WHERE name = 'idx_MaywoodsDateTime')
-                    DROP INDEX [log_LPRES_ATNA_Simplified].[idx_MaywoodsDateTime]
-                    GO
+                ExecuteNonQuery(@"ALTER TABLE log_LPRES_ATNA_Simplified ADD CONSTRAINT PK_MaywoodsID PRIMARY KEY(MaywoodsID);");
+                ExecuteNonQuery(@"IF EXISTS ( SELECT NAME FROM dbo.sysindexes WHERE name = 'idx_MaywoodsDateTime') 
+DROP INDEX [log_LPRES_ATNA_Simplified].[idx_MaywoodsDateTime]");
 
-                    IF NOT EXISTS ( SELECT NAME FROM dbo.sysindexes WHERE name = 'idx_MaywoodsDateTime')
-                    CREATE INDEX idx_MaywoodsDateTime ON [log_LPRES_ATNA_Simplified] (MaywoodsDateTime)
-                    GO";
 
-                using (SqlCommand _cmd = new SqlCommand(queryStatement, dbConnection))
-                {
-                    dbConnection.Open();
-                    _cmd.ExecuteNonQuery();
-                    dbConnection.Close();
-                }
+                ExecuteNonQuery(@"IF NOT EXISTS ( SELECT NAME FROM dbo.sysindexes WHERE name = 'idx_MaywoodsDateTime') 
+CREATE INDEX idx_MaywoodsDateTime ON [log_LPRES_ATNA_Simplified] (MaywoodsDateTime)");
+
+
             }
             catch (Exception ex)
             {
@@ -62,25 +79,18 @@ namespace MigForwardingLibrary
         public void Downgrade() {
             try
             {
-                var dbConnection = new SqlConnection(ConnectionString);
-                var queryStatement = @"  
-                    DELETE FROM log_LPRES_ATNA_Simplified WHERE [MaywoodsID] IS NOT NULL;
-                    DELETE FROM log_LPRES_ATNA_Simplified WHERE [MaywoodsDateTime] IS NOT NULL;
-                    DELETE FROM log_LPRES_ATNA_Simplified WHERE [MaywoodsAuditID] IS NOT NULL;
-                    GO
 
-                    ALTER TABLE log_LPRES_ATNA_Simplified DROP CONSTRAINT PK_MaywoodsID PRIMARY KEY(MaywoodsID);
 
-                    IF EXISTS ( SELECT NAME FROM dbo.sysindexes WHERE name = 'idx_MaywoodsDateTime')
-                    DROP INDEX [log_LPRES_ATNA_Simplified].[idx_MaywoodsDateTime]
-                    GO";
+             ExecuteNonQuery(@"IF EXISTS(SELECT NAME FROM dbo.sysindexes WHERE name = 'idx_MaywoodsDateTime')
+                             DROP INDEX[log_LPRES_ATNA_Simplified].[idx_MaywoodsDateTime]");           
+             ExecuteNonQuery(@"ALTER TABLE log_LPRES_ATNA_Simplified DROP CONSTRAINT PK_MaywoodsID;");
+             ExecuteNonQuery(@"ALTER TABLE log_LPRES_ATNA_Simplified DROP COLUMN[MaywoodsID];"); 
+             ExecuteNonQuery(@"ALTER TABLE log_LPRES_ATNA_Simplified DROP COLUMN[MaywoodsDateTime] ;");
+             ExecuteNonQuery(@"ALTER TABLE log_LPRES_ATNA_Simplified DROP COLUMN[MaywoodsAuditID] ;");
 
-                using (SqlCommand _cmd = new SqlCommand(queryStatement, dbConnection))
-                {
-                    dbConnection.Open();
-                    _cmd.ExecuteNonQuery();
-                    dbConnection.Close();
-                }
+     
+               
+
             }
             catch (Exception ex)
             {
@@ -91,29 +101,26 @@ namespace MigForwardingLibrary
 
         }
 
-        public DataTable SelectTop()
+        public DataTable SelectTop50()
         {
-            var dbConnection = new SqlConnection(ConnectionString);
-            var queryStatement = @"SELECT TOP (1000) [EventDateTime]
-                          ,[EventType]
-                          ,[NHSNumber]
-                          ,[StateID]
-                          ,[UserID]
-                          ,[DocumentUUID]
-                          ,[DocumentTitle]
-                          ,[ClientIP]
-                       FROM[" + Config.Catalog + "].[" + Config.Schema + "].[" + Config.TableName + "]";
-            
-            var dataTable = new DataTable();
 
-            using (SqlCommand _cmd = new SqlCommand(queryStatement, dbConnection))
-            {
-                dbConnection.Open();
-                var adapter = new SqlDataAdapter(_cmd);
-                adapter.Fill(dataTable);
-                dbConnection.Close();
-            }
-            return dataTable;
+            var queryStatement = @"  SELECT TOP (50)
+                   [EventDateTime]
+                      ,[EventType]
+                      ,[NHSNumber]
+                      ,[StateID]
+                      ,[UserID]
+                      ,[DocumentUUID]
+                      ,[DocumentTitle]
+                      ,[ClientIP]
+                      ,[MaywoodsID]
+                      ,[MaywoodsDateTime]
+                      ,[MaywoodsAuditID]
+                       FROM[" + Config.Catalog + "].[" + Config.Schema + "].[" + Config.TableName + "]	  " +
+                       "WHERE [MaywoodsDateTime] IS NULL AND  [MaywoodsAuditID] IS NULL      ORDER BY[EventDateTime] ";
+
+
+            return SelectAndFill(queryStatement);
         }
 
         private string BuildConnectionString()

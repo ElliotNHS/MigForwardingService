@@ -1,0 +1,15 @@
+﻿  SELECT TOP (50)
+   [EventDateTime]
+      ,[EventType]
+      ,[NHSNumber]
+      ,[StateID]
+      ,[UserID]
+      ,[DocumentUUID]
+      ,[DocumentTitle]
+      ,[ClientIP]
+      ,[MaywoodsID]
+      ,[MaywoodsDateTime]
+      ,[MaywoodsAuditID]
+	  FROM [ATNA-Update-Test].dbo.[log_LPRES_ATNA_Simplified] 
+	  WHERE [MaywoodsDateTime] IS NULL AND  [MaywoodsAuditID] IS NULL
+	  ORDER BY [EventDateTime] 

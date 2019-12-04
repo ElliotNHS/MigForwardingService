@@ -24,22 +24,26 @@ namespace MigForwardingLibrary
 
             var dbContext = new MigDbContext(config);
             dbContext.Upgrade();
-            var result = dbContext.SelectTop();
 
 
-            
-            foreach (DataRow dataRow in result.Rows)
-            {
-                foreach (var item in dataRow.ItemArray)
-                {
-                    Console.WriteLine(item);
-                }
-            }
+
+            //Console.ReadKey();
+            //dbContext.Downgrade();
 
             _semaphoreSlim = new SemaphoreSlim(0);
             while(true)
             {
-                Console.WriteLine("It is {0} and all is well.", DateTime.Now);
+                Console.WriteLine("It is {0} and all is well.", DateTime.Now); 
+                var result = dbContext.SelectTop50();
+
+
+                foreach (DataRow dataRow in result.Rows)
+                {
+                    foreach (var item in dataRow.ItemArray)
+                    {
+                        Console.WriteLine(item);
+                    }
+                }
                 Thread.Sleep(3000);
 
                 if (_semaphoreSlim.Wait(500))
