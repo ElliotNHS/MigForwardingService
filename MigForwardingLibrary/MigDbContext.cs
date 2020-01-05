@@ -1,7 +1,9 @@
-﻿using System;
+﻿using MigForwardingLibrary.Exceptions;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,14 +24,22 @@ namespace MigForwardingLibrary
 
         public void ExecuteNonQuery(string queryStatement)
         {
-            var dbConnection = new SqlConnection(ConnectionString);
-            using (SqlCommand _cmd = new SqlCommand(queryStatement, dbConnection))
+            try
             {
-                dbConnection.Open();
-                _cmd.ExecuteNonQuery();
-                dbConnection.Close();
+                var dbConnection = new SqlConnection(ConnectionString);
+                using (SqlCommand _cmd = new SqlCommand(queryStatement, dbConnection))
+                {
+                    dbConnection.Open();
+                    _cmd.ExecuteNonQuery();
+                    dbConnection.Close();
+                }
+            }
+            catch (Exception e)
+            {
+                throw new TableUpdateException("Could not execute NonQuery",e);
             }
         }
+
         public DataTable SelectAndFill(string queryStatement)
         {
             var dbConnection = new SqlConnection(ConnectionString);
@@ -46,7 +56,6 @@ namespace MigForwardingLibrary
         }
 
         public void Upgrade() {
-
             try
             {
                 ExecuteNonQuery(@"ALTER TABLE log_LPRES_ATNA_Simplified ADD[MaywoodsID]  BIGINT IDENTITY(1, 1);");
@@ -55,19 +64,25 @@ namespace MigForwardingLibrary
                 ExecuteNonQuery(@"ALTER TABLE log_LPRES_ATNA_Simplified ADD CONSTRAINT PK_MaywoodsID PRIMARY KEY(MaywoodsID);");
                 ExecuteNonQuery(@"IF EXISTS ( SELECT NAME FROM dbo.sysindexes WHERE name = 'idx_MaywoodsDateTime') 
                                 DROP INDEX [log_LPRES_ATNA_Simplified].[idx_MaywoodsDateTime]");
-
                 ExecuteNonQuery(@"IF NOT EXISTS ( SELECT NAME FROM dbo.sysindexes WHERE name = 'idx_MaywoodsDateTime') 
                                 CREATE INDEX idx_MaywoodsDateTime ON [log_LPRES_ATNA_Simplified] (MaywoodsDateTime)");
 
             }
+            catch (Exception ex) when (ex is TableUpdateException)
+            {
+                Console.WriteLine("Failed to upgrade the MIG forwarding table-ExecuteNonQuery failed.");
+                using (EventLog eventLog = new EventLog("Application"))
+                {
+                    eventLog.Source = "MigForwardingService";
+                    eventLog.WriteEntry("Log message example", EventLogEntryType.Information, 101, 1);
+                }
+            }
             catch (Exception ex)
             {
-                Console.WriteLine("Failed to upgrade the MIG forwarding table");
+                Console.WriteLine("Failed to upgrade the MIG forwarding table-Unknown error "+ex.Message);
                 Console.WriteLine(ex.Message);
                 Console.ReadKey();
             }
-           
-
         }
         //Check when database was last updated?
         //select * from sys.objects
@@ -75,8 +90,6 @@ namespace MigForwardingLibrary
         public void Downgrade() {
             try
             {
-
-
              ExecuteNonQuery(@"IF EXISTS(SELECT NAME FROM dbo.sysindexes WHERE name = 'idx_MaywoodsDateTime')
                              DROP INDEX[log_LPRES_ATNA_Simplified].[idx_MaywoodsDateTime]");           
              ExecuteNonQuery(@"ALTER TABLE log_LPRES_ATNA_Simplified DROP CONSTRAINT PK_MaywoodsID;");
@@ -114,7 +127,6 @@ namespace MigForwardingLibrary
 
             return SelectAndFill(queryStatement);
         }
-
         private string BuildConnectionString()
         {
             // Initialize the connection string builder for the
