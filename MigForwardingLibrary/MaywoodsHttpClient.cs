@@ -79,7 +79,7 @@ namespace SerializationExample
             // Serialization function (Stores Object Data in File)
             // SerializationInfo holds the key value pairs
             // StreamingContext can hold additional info
-            // but we aren't using it here
+            
             public void GetObjectData(SerializationInfo info, StreamingContext context)
             {
                 // Assign key value pair for your data
@@ -107,7 +107,6 @@ namespace DeserializeExample
     {
         class Program
         {
-
             static void Main(string[] args)
             {
                 Animal bowser = new Animal("Bowser", 45, 25);
@@ -137,7 +136,7 @@ namespace DeserializeExample
 
                 // XmlSerializer writes object data as XML
                 XmlSerializer serializer = new XmlSerializer(typeof(Animal));
-                using (TextWriter tw = new StreamWriter(@"C:\Users\derekbanas\C#Data\bowser.xml"))
+                using (TextWriter tw = new StreamWriter(@"C:\Users\WY6282\C#Data\bowser.xml"))
                 {
                     serializer.Serialize(tw, bowser);
                 }
@@ -147,7 +146,7 @@ namespace DeserializeExample
 
                 // Deserialize from XML to the object
                 XmlSerializer deserializer = new XmlSerializer(typeof(Animal));
-                TextReader reader = new StreamReader(@"C:\Users\derekbanas\C#Data\bowser.xml");
+                TextReader reader = new StreamReader(@"C:\Users\WY6282\C#Data\bowser.xml");
                 object obj = deserializer.Deserialize(reader);
                 bowser = (Animal)obj;
                 reader.Close();
@@ -162,7 +161,7 @@ namespace DeserializeExample
                 new Animal("Peach", 40, 20)
             };
 
-                using (Stream fs = new FileStream(@"C:\Users\derekbanas\C#Data\animals.xml",
+                using (Stream fs = new FileStream(@"C:\Users\WY6282\C#Data\animals.xml",
                     FileMode.Create, FileAccess.Write, FileShare.None))
                 {
                     XmlSerializer serializer2 = new XmlSerializer(typeof(List<Animal>));
@@ -175,17 +174,15 @@ namespace DeserializeExample
                 // Read data from XML
                 XmlSerializer serializer3 = new XmlSerializer(typeof(List<Animal>));
 
-                using (FileStream fs2 = File.OpenRead(@"C:\Users\derekbanas\C#Data\animals.xml"))
+                using (FileStream fs2 = File.OpenRead(@"C:\Users\WY6282\C#Data\animals.xml"))
                 {
                     theAnimals = (List<Animal>)serializer3.Deserialize(fs2);
                 }
 
-
                 foreach (Animal a in theAnimals)
                 {
                     Console.WriteLine(a.ToString());
-                }
-
+                }          
                 Console.ReadLine();
 
             }
