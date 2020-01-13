@@ -25,8 +25,8 @@ namespace MigForwardingLibrary
             var dbContext = new MigDbContext(config);
             dbContext.Upgrade();
 
-            //Console.ReadKey();
-            //dbContext.Downgrade();
+            Console.ReadKey();
+            dbContext.Downgrade();
 
             _semaphoreSlim = new SemaphoreSlim(0);
             while(true)
@@ -66,15 +66,17 @@ namespace MigForwardingLibrary
         {
             // Initialize the connection string builder for the
             // underlying provider.
-            SqlConnectionStringBuilder sqlBuilder = new SqlConnectionStringBuilder();
+            SqlConnectionStringBuilder sqlBuilder = new SqlConnectionStringBuilder
+            {
 
-            // Set the properties for the data source.
-            sqlBuilder.DataSource = config.Source;
-            sqlBuilder.InitialCatalog = config.Catalog;
-            sqlBuilder.MultipleActiveResultSets = true;
-            sqlBuilder.ApplicationName = "EntityFramework";
-            
-            if(!config.IntergratedSecurity)
+                // Set the properties for the data source.
+                DataSource = config.Source,
+                InitialCatalog = config.Catalog,
+                MultipleActiveResultSets = true,
+                ApplicationName = "EntityFramework"
+            };
+
+            if (!config.IntergratedSecurity)
             {
                 sqlBuilder.UserID = config.SqlUsername;
                 sqlBuilder.Password = config.SqlPassword;

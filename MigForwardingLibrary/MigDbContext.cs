@@ -36,7 +36,7 @@ namespace MigForwardingLibrary
             }
             catch (Exception e)
             {
-                throw new TableUpdateException("Could not execute NonQuery",e);
+                throw new TableUpdateException("Could not execute NonQuery", e);
             }
         }
 
@@ -84,9 +84,7 @@ namespace MigForwardingLibrary
                 Console.ReadKey();
             }
         }
-        //Check when database was last updated?
-        //select * from sys.objects
-        //order by modify_date desc
+       
         public void Downgrade() {
             try
             {
@@ -106,7 +104,7 @@ namespace MigForwardingLibrary
             }
 
         }
-
+        //Wake and process 50 oldest records in the database   VVVVVVVVV
         public DataTable SelectTop50()
         {
 
