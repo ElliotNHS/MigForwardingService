@@ -108,24 +108,18 @@ namespace MigForwardingLibrary
         public DataTable SelectTop50()
         {
 
-            var queryStatement = @"  SELECT TOP (50)
-             [EventDateTime]
-             ,[EventType]
-             ,[NHSNumber]
-             ,[StateID]
-             ,[UserID]
-             ,[DocumentUUID]
-             ,[DocumentTitle]
-             ,[ClientIP]
-             ,[MaywoodsID]
-             ,[MaywoodsDateTime]
-             ,[MaywoodsAuditID]
- 
-              FROM  [" + Config.Catalog + "].[" + Config.Schema + "].[" + Config.TableName + "]	  " +
-             "WHERE [EventType] = 'MIG'  " +                      
-             "WHERE [MaywoodsDateTime] IS NULL" +
-             "AND   [MaywoodsAuditID]    IS NULL" +
-             "ORDER BY[EventDateTime] ";
+            var queryStatement = @" SELECT TOP (50)   [EventDateTime]
+         ,[EventType]
+         ,[NHSNumber]
+         ,[StateID]
+         ,[UserID]
+         ,[DocumentUUID]
+         ,[DocumentTitle]
+         ,[ClientIP]       
+          FROM [ATNA-Update-Test].[dbo].[log_LPRES_ATNA_Simplified]
+         WHERE [EventType] = 'MIG' AND [MaywoodsDateTime] IS NULL
+         AND   [MaywoodsAuditID] IS NULL
+         ORDER BY[EventDateTime];";
                        
             return SelectAndFill(queryStatement);
         }
