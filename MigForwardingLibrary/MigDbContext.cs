@@ -109,20 +109,24 @@ namespace MigForwardingLibrary
         {
 
             var queryStatement = @"  SELECT TOP (50)
-                   [EventDateTime]
-                      ,[EventType]
-                      ,[NHSNumber]
-                      ,[StateID]
-                      ,[UserID]
-                      ,[DocumentUUID]
-                      ,[DocumentTitle]
-                      ,[ClientIP]
-                      ,[MaywoodsID]
-                      ,[MaywoodsDateTime]
-                      ,[MaywoodsAuditID]
-                       FROM[" + Config.Catalog + "].[" + Config.Schema + "].[" + Config.TableName + "]	  " +
-                       "WHERE [EventType] = 'MIG'  ORDER BY[EventDateTime] ";
+             [EventDateTime]
+             ,[EventType]
+             ,[NHSNumber]
+             ,[StateID]
+             ,[UserID]
+             ,[DocumentUUID]
+             ,[DocumentTitle]
+             ,[ClientIP]
+             ,[MaywoodsID]
+             ,[MaywoodsDateTime]
+             ,[MaywoodsAuditID]
 
+             FROM[" + Config.Catalog + "].[" + Config.Schema + "].[" + Config.TableName + "]	  " +
+             "WHERE [EventType] = 'MIG'  " +                      
+             "WHERE [MaywoodsDateTime] IS NULL" +
+             "AND   [MaywoodsAuditID]    IS NULL" +
+             "ORDER BY[EventDateTime] ";
+                       
             return SelectAndFill(queryStatement);
         }
         private string BuildConnectionString()
