@@ -20,41 +20,26 @@ namespace MigForwardingLibrary
 
         public void Start() 
         {
-
             var config = new MigForwardingConfiguration();
-            var connectionstring = BuildConnectionString(config);
-            var dbConnection = new SqlConnection(connectionstring);
-            var queryStatement = @"SELECT TOP (1000) [EventDateTime]
-                          ,[EventType]
-                          ,[NHSNumber]
-                          ,[StateID]
-                          ,[UserID]
-                          ,[DocumentUUID]
-                          ,[DocumentTitle]
-                          ,[ClientIP]
-                       FROM[" + config.Catalog + "].[" + config.Schema + "].[" + config.TableName + "]";
-            var dataTable = new DataTable();
 
-            using (SqlCommand _cmd = new SqlCommand(queryStatement, dbConnection))
-            {
-                dbConnection.Open();
-                var adapter = new SqlDataAdapter(_cmd);
-                adapter.Fill(dataTable);
-                dbConnection.Close();
-            }
+            var dbContext = new MigDbContext(config);
+            dbContext.Upgrade();
 
-            foreach (DataRow dataRow in dataTable.Rows)
-            {
-                foreach (var item in dataRow.ItemArray)
-                {
-                    Console.WriteLine(item);
-                }
-            }
+            Console.ReadKey();
+            dbContext.Downgrade();
 
             _semaphoreSlim = new SemaphoreSlim(0);
             while(true)
             {
-                Console.WriteLine("It is {0} and all is well.", DateTime.Now);
+                Console.WriteLine("It is {0} and all is well.", DateTime.Now); 
+                var result = dbContext.SelectTop50();
+                foreach (DataRow dataRow in result.Rows)
+                {
+                    foreach (var item in dataRow.ItemArray)
+                    {
+                        Console.WriteLine(item);
+                    }
+                }
                 Thread.Sleep(3000);
 
                 if (_semaphoreSlim.Wait(500))
@@ -81,15 +66,17 @@ namespace MigForwardingLibrary
         {
             // Initialize the connection string builder for the
             // underlying provider.
-            SqlConnectionStringBuilder sqlBuilder = new SqlConnectionStringBuilder();
+            SqlConnectionStringBuilder sqlBuilder = new SqlConnectionStringBuilder
+            {
 
-            // Set the properties for the data source.
-            sqlBuilder.DataSource = config.Source;
-            sqlBuilder.InitialCatalog = config.Catalog;
-            sqlBuilder.MultipleActiveResultSets = true;
-            sqlBuilder.ApplicationName = "EntityFramework";
-            
-            if(!config.IntergratedSecurity)
+                // Set the properties for the data source.
+                DataSource = config.Source,
+                InitialCatalog = config.Catalog,
+                MultipleActiveResultSets = true,
+                ApplicationName = "EntityFramework"
+            };
+
+            if (!config.IntergratedSecurity)
             {
                 sqlBuilder.UserID = config.SqlUsername;
                 sqlBuilder.Password = config.SqlPassword;
@@ -99,7 +86,7 @@ namespace MigForwardingLibrary
 
             // Build the SqlConnection connection string.
             string providerString = sqlBuilder.ToString();
-            Console.WriteLine(providerString);
+            Console.WriteLine(providerString);   
             Console.ReadKey();
 
             return providerString;
