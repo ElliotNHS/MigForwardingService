@@ -120,7 +120,7 @@ namespace MigForwardingLibrary
              ,[MaywoodsID]
              ,[MaywoodsDateTime]
              ,[MaywoodsAuditID]
-
+ 
               FROM  [" + Config.Catalog + "].[" + Config.Schema + "].[" + Config.TableName + "]	  " +
              "WHERE [EventType] = 'MIG'  " +                      
              "WHERE [MaywoodsDateTime] IS NULL" +
