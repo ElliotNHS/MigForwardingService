@@ -30,7 +30,14 @@ namespace MigForwardingLibrary
 
             _semaphoreSlim = new SemaphoreSlim(0);
             while(true)
+
             {
+                private void EventLog()
+                {
+                    WriteEntry(Information, String);
+                    string "Service has started";
+                }
+              
                 Console.WriteLine("It is {0} and all is well.", DateTime.Now); 
                 var result = dbContext.SelectTop50();
                 foreach (DataRow dataRow in result.Rows)
@@ -42,7 +49,7 @@ namespace MigForwardingLibrary
                 }
                 Thread.Sleep(3000);
 
-                if (_semaphoreSlim.Wait(500))
+                if (_semaphoreSlim.Wait(1000))
                 {
                     OnStopping();
                     break;
@@ -60,6 +67,13 @@ namespace MigForwardingLibrary
             Console.ReadKey();
             // Here any connections would be closed, log files would be finished, 
             // release any references to unmanaged code, any clean up activity
+            
+        }
+
+        private void EventLog()
+        {
+            WriteEntry (Information, String);
+            string "Service has stopped";
         }
 
         private string BuildConnectionString(MigForwardingConfiguration config)

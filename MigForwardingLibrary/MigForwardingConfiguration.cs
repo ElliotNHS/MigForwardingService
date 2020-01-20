@@ -65,6 +65,11 @@ namespace MigForwardingLibrary
             } else
             {
                 throw new Exception("Could not load configuration settings file");
+                public void EventLog()
+                {
+                    WriteEntry(String,EventLog,ErrorEventArgs,);
+                    string "Service has an error";
+                }
             }
 
             Console.WriteLine("IntergratedSecurity = " + IntergratedSecurity);
