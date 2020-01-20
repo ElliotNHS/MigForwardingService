@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Xml.Serialization;
 
@@ -65,11 +66,12 @@ namespace MigForwardingLibrary
             } else
             {
                 throw new Exception("Could not load configuration settings file");
-                public void EventLog()
-                {
-                    WriteEntry(String,EventLog,ErrorEventArgs,);
-                    string "Service has an error";
-                }
+                // Create an EventLog instance and assign its source.
+                EventLog myLog = new EventLog("MyNewLog");
+                myLog.Source = "MyNewLogSource";
+
+                // Write an informational entry to the event log.    
+                myLog.WriteEntry("Service has an error", EventLogEntryType.Error);
             }
 
             Console.WriteLine("IntergratedSecurity = " + IntergratedSecurity);
@@ -79,6 +81,8 @@ namespace MigForwardingLibrary
             Console.WriteLine("Schema = " + Schema);
             Console.WriteLine("Source = " + Source);
             Console.ReadKey();
+
+          
         }
 
         private void LoadFromXml(string path)

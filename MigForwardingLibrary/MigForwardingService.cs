@@ -8,6 +8,7 @@ using System.Threading;
 using System.Data.SqlClient;
 using System.Data.Entity.Core.EntityClient;
 using System.Data;
+using System.Diagnostics;
 
 namespace MigForwardingLibrary
 {
@@ -20,6 +21,14 @@ namespace MigForwardingLibrary
 
         public void Start() 
         {
+            // Create an EventLog instance and assign its source.
+
+            EventLog Startlog = new EventLog("MyStartLog");
+            Startlog.Source = "MyNewLogSource";
+
+            // Write an informational entry to the event log.    
+            Startlog.WriteEntry("Service has started.", EventLogEntryType.Information);
+
             var config = new MigForwardingConfiguration();
 
             var dbContext = new MigDbContext(config);
@@ -32,13 +41,15 @@ namespace MigForwardingLibrary
             while(true)
 
             {
-                private void EventLog()
-                {
-                    WriteEntry(Information, String);
-                    string "Service has started";
-                }
-              
-                Console.WriteLine("It is {0} and all is well.", DateTime.Now); 
+                // Create an EventLog instance and assign its source.
+                EventLog Batchlog = new EventLog("MyBatchLog");
+                Batchlog.Source = "MyNewLogSource";
+
+                // Write an informational entry to the event log.    
+                Batchlog.WriteEntry("Service is waking up and processing the next 50 records.", EventLogEntryType.Information);
+
+
+                 Console.WriteLine("It is {0} and all is well.", DateTime.Now); 
                 var result = dbContext.SelectTop50();
                 foreach (DataRow dataRow in result.Rows)
                 {
@@ -67,14 +78,16 @@ namespace MigForwardingLibrary
             Console.ReadKey();
             // Here any connections would be closed, log files would be finished, 
             // release any references to unmanaged code, any clean up activity
-            
+            // Create an EventLog instance and assign its source.
+
+            EventLog Stoplog = new EventLog("MyStopLog");
+            Stoplog.Source = "MyNewLogSource";
+
+            // Write an informational entry to the event log.    
+            Stoplog.WriteEntry("Service has stopped.", EventLogEntryType.Information);
         }
 
-        private void EventLog()
-        {
-            WriteEntry (Information, String);
-            string "Service has stopped";
-        }
+      
 
         private string BuildConnectionString(MigForwardingConfiguration config)
         {
